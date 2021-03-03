@@ -53,6 +53,39 @@ app.post('/datapoint', authenticateJWT, (req, res) => {
     });
 
     pool.query('INSERT INTO eit.test(ts, sensor_value) VALUES (current_timestamp, $1)', [req.body.value], (err, res) => {
+      console.log(err, res)
+      pool.end()
+    });
+
+    res.sendStatus(201);
+});
+
+
+app.post('/datapoints', authenticateJWT, (req, res) => {
+    fs = require('fs');
+    console.log(req.body.values);
+
+    const pool = new Pool({
+      user: 'node_eit',
+      host: 'localhost',
+      database: 'postgres',
+      password: 'node_eit_jernbane_pwd',
+      port: 5432,
+    });
+
+    let datapoints_flattened = [];
+    let parameters = "";
+
+    for (let pos=0; pos<req.body.values.length; pos++) {
+        console.log(req.body.values[pos]);
+        datapoints_flattened.push(req.body.values[pos]);
+        if (pos==0) {
+            parameters = "(current_timestamp - interval \'"+ Number(pos+1) +" seconds\', $"+ Number(pos+1) + ")"
+        } else {
+            parameters = parameters + ",(current_timestamp - interval \'"+Number(pos+1)+" seconds\', $"+ Number(pos+1) + ")"
+        }
+    }
+    pool.query('INSERT INTO eit.test(ts, sensor_value) VALUES '+parameters, datapoints_flattened , (err, res) => {
       console.log(err, res) 
       pool.end() 
     });
