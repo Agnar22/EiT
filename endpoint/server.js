@@ -100,16 +100,15 @@ app.post('/datapoints', authenticateJWT, (req, res) => {
 
 
 app.post('/login', (req, res) => {
-    // read username and password from request body
+    // Read username and password from request body.
     const { username, password } = req.body;
     console.log(req.body.username);
 
-    // filter user from the users array by username and password
+    // Filter user from the users array by username and password.
     const user = users.find(u => { return u.username === username && u.password === password });
 
     if (user) {
-        // generate an access token
-        //const accessToken = jwt.sign({ username: user.username, role: user.role }, accessTokenSecret, { expiresIn: '20m' });
+        // Generate an access token.
         const accessToken = jwt.sign({ username: user.username, role: user.role }, accessTokenSecret);
 
         res.json({
