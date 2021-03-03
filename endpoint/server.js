@@ -118,7 +118,12 @@ app.post('/datapoints', authenticateJWT, (req, res) => {
             parameters = parameters + ",(current_timestamp - interval \'"+Number(pos+1)+" seconds\', $"+ Number(pos+1) + ")"
         }
     }
-    insert_to_db(parameters, datapoints_flattened);
+    try {
+        insert_to_db(parameters, datapoints_flattened).then();
+    } catch (e) {
+        response_status=500;
+        response_message="Database error.";
+    }
     res.status(response_status).send(response_message);
 });
 
