@@ -1,26 +1,34 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
-
+const audit = require('express-requests-logger');
 const app = express();
-
 const accessTokenSecret = 'somerandomaccesstoken';
 
 const { Pool } = require('pg');
+const { Client } = require('pg');
+const users = [];
 
-const users = [
-    {
-        username: 'john',
-        password: 'password123admin',
-        role: 'admin'
-    }, {
-        username: 'anna',
-        password: 'password123member',
-        role: 'member'
-    }
-]
+const client = new Client({
+  user: '',
+  host: '',
+  database: '',
+  password: '',
+  port: ,
+});
+
+client.connect();
+
+app.get('/', function (req, res) {
+   res.send('Hello World');
+});
 
 app.use(bodyParser.json());
+
+app.use(audit({
+    audit:true,
+    doubleAudit:true
+}));
 
 const authenticateJWT = (req, res, next) => {
     const authHeader = req.headers.authorization;
@@ -41,39 +49,31 @@ const authenticateJWT = (req, res, next) => {
 };
 
 function insert_to_db(params, args) {
-        const pool = new Pool({
-          user: 'node_eit',
-          host: 'localhost',
-          database: 'postgres',
-          password: 'node_eit_jernbane_pwd',
-          port: 5432,
-        });
-
-        pool.query('INSERT INTO eit.test(ts, sensor_value) VALUES '+params, args).then(res => {
-            pool.end();
-        }).catch(err => {
-            throw new Error("Database error.");
-        });
+    client.query('INSERT INTO eit.test(ts, sensor_value) VALUES '+params+' RETURNING *', args).then(res => {
+        console.log("Inserted into database.");
+    }).catch(err => {
+        console.log(err.stack);
+    });
 }
 
 app.post('/datapoint', authenticateJWT, (req, res) => {
     fs = require('fs');
-    console.log(req.body.value);
+
+    let response_status=201;
+    let response_message="Uploaded 1 datapoint.";
 
     try {
         insert_to_db('(current_timestamp, $1)', [req.body.value]);
-    } catch (e) {
+    } catch (error) {
+        console.log("Failed to insert a single datapoint: "+error);
         response_status=500;
         response_message="Database error.";
     }
     res.status(response_status).send(response_message);
 });
 
-
 app.post('/datapoints', authenticateJWT, (req, res) => {
     fs = require('fs');
-    console.log(req.body.values);
-
 
     let datapoints_flattened = [];
     let parameters = "";
@@ -81,7 +81,7 @@ app.post('/datapoints', authenticateJWT, (req, res) => {
     let response_message="Uploaded "+req.body.values.length+" datapoints.";
 
     for (let pos=0; pos<req.body.values.length; pos++) {
-        console.log(req.body.values[pos]);
+        //console.log(req.body.values[pos]);
         datapoints_flattened.push(req.body.values[pos]);
         if (pos==0) {
             parameters = "(current_timestamp - interval \'"+ Number(pos+1) +" seconds\', $"+ Number(pos+1) + ")"
@@ -90,8 +90,9 @@ app.post('/datapoints', authenticateJWT, (req, res) => {
         }
     }
     try {
-        insert_to_db(parameters, datapoints_flattened).then();
-    } catch (e) {
+        insert_to_db(parameters, datapoints_flattened);
+    } catch (error) {
+        console.log("Failed to insert multiple datapoints: "+error);
         response_status=500;
         response_message="Database error.";
     }
@@ -120,5 +121,5 @@ app.post('/login', (req, res) => {
 });
 
 app.listen(4013, () => {
-    console.log('Authentication service started on port 3000');
+    console.log('Authentication service started on port 4013.');
 });
