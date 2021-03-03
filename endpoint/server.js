@@ -40,8 +40,7 @@ const authenticateJWT = (req, res, next) => {
     }
 };
 
-async function insert_to_db(params, args) {
-        let success = true;
+function insert_to_db(params, args) {
         const pool = new Pool({
           user: 'node_eit',
           host: 'localhost',
@@ -49,8 +48,11 @@ async function insert_to_db(params, args) {
           password: 'node_eit_jernbane_pwd',
           port: 5432,
         });
-        pool.query('INSERT INTO eit.test(ts, sensor_value) VALUES '+params, args, (err, res) => {
+
+        pool.query('INSERT INTO eit.test(ts, sensor_value) VALUES '+params, args).then(res => {
             pool.end();
+        }).catch(err => {
+            throw new Error("Database error.");
         });
 }
 
@@ -58,10 +60,13 @@ app.post('/datapoint', authenticateJWT, (req, res) => {
     fs = require('fs');
     console.log(req.body.value);
 
-
-    insert_to_db('(current_timestamp, $1)', [req.body.value]);
-
-    res.sendStatus(201);
+    try {
+        insert_to_db('(current_timestamp, $1)', [req.body.value]);
+    } catch (e) {
+        response_status=500;
+        response_message="Database error.";
+    }
+    res.status(response_status).send(response_message);
 });
 
 
@@ -84,7 +89,12 @@ app.post('/datapoints', authenticateJWT, (req, res) => {
             parameters = parameters + ",(current_timestamp - interval \'"+Number(pos+1)+" seconds\', $"+ Number(pos+1) + ")"
         }
     }
-    insert_to_db(parameters, datapoints_flattened);
+    try {
+        insert_to_db(parameters, datapoints_flattened).then();
+    } catch (e) {
+        response_status=500;
+        response_message="Database error.";
+    }
     res.status(response_status).send(response_message);
 });
 
