@@ -40,22 +40,26 @@ const authenticateJWT = (req, res, next) => {
     }
 };
 
+async function insert_to_db(params, args) {
+        let success = true;
+        const pool = new Pool({
+          user: 'node_eit',
+          host: 'localhost',
+          database: 'postgres',
+          password: 'node_eit_jernbane_pwd',
+          port: 5432,
+        });
+        pool.query('INSERT INTO eit.test(ts, sensor_value) VALUES '+params, args, (err, res) => {
+            pool.end();
+        });
+}
+
 app.post('/datapoint', authenticateJWT, (req, res) => {
     fs = require('fs');
     console.log(req.body.value);
 
-    const pool = new Pool({
-      user: 'node_eit',
-      host: 'localhost',
-      database: 'postgres',
-      password: 'node_eit_jernbane_pwd',
-      port: 5432,
-    });
 
-    pool.query('INSERT INTO eit.test(ts, sensor_value) VALUES (current_timestamp, $1)', [req.body.value], (err, res) => {
-      console.log(err, res)
-      pool.end()
-    });
+    insert_to_db('(current_timestamp, $1)', [req.body.value]);
 
     res.sendStatus(201);
 });
@@ -65,16 +69,11 @@ app.post('/datapoints', authenticateJWT, (req, res) => {
     fs = require('fs');
     console.log(req.body.values);
 
-    const pool = new Pool({
-      user: 'node_eit',
-      host: 'localhost',
-      database: 'postgres',
-      password: 'node_eit_jernbane_pwd',
-      port: 5432,
-    });
 
     let datapoints_flattened = [];
     let parameters = "";
+    let response_status=201;
+    let response_message="Uploaded "+req.body.values.length+" datapoints.";
 
     for (let pos=0; pos<req.body.values.length; pos++) {
         console.log(req.body.values[pos]);
@@ -85,12 +84,8 @@ app.post('/datapoints', authenticateJWT, (req, res) => {
             parameters = parameters + ",(current_timestamp - interval \'"+Number(pos+1)+" seconds\', $"+ Number(pos+1) + ")"
         }
     }
-    pool.query('INSERT INTO eit.test(ts, sensor_value) VALUES '+parameters, datapoints_flattened , (err, res) => {
-      console.log(err, res) 
-      pool.end() 
-    });
-
-    res.sendStatus(201);
+    insert_to_db(parameters, datapoints_flattened);
+    res.status(response_status).send(response_message);
 });
 
 
