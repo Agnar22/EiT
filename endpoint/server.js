@@ -58,7 +58,6 @@ function insert_to_db(params, args) {
 
 app.post('/datapoint', authenticateJWT, (req, res) => {
     fs = require('fs');
-
     let response_status=201;
     let response_message="Uploaded 1 datapoint.";
 
