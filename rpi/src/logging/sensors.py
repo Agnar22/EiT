@@ -1,46 +1,67 @@
 
 from sense_hat import SenseHat
-from queue import Queue
+import adafruit_gps
+import serial
+
 import time
-
-
-class DataQueue():
-
-    def __init__(self):
-        self.queue = Queue()
-
-    def put(self, data_type: str, data: list):
-        queue_element = {"data_type": data_type, "data": data}
-        self.queue.put(queue_element)
-
+from datetime import datetime
+from logger import DataLogger
 
 class SensorReader():
 
     def __init__(self):
+        
+        self.logger = DataLogger()
 
-        self.data_queue = Queue()
         self.sense = SenseHat()
         self.sense.set_imu_config(True, True, False)
 
+        self.uart = serial.Serial("/dev/ttyS0", baudrate=9600, timeout=10)
+        self.gps = adafruit_gps.GPS(self.uart, debug=False)
+        # Turn on the basic GGA and RMC info
+        self.gps.send_command(b"PMTK314,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0")
+        # Set update rate to 1 Hz
+        self.gps.send_command(b"PMTK220,1000")
+
     def read_gyro(self):
-        while True:
-            orientation = self.sense.get_orientation_degrees()
-            print("p: {pitch}, r: {roll}, y: {yaw}".format(**orientation))
-            time.sleep(1)
-
+        return self.sense.get_orientation_degrees()
+    
     def read_acc(self):
-        while True:
-            acc = self.sense.accel_raw
-            print(acc)
-            time.sleep(0.1)
-            #print(f"x: {acc["x"]}, y: {acc["y"]}, z: {acc["z"]}")
+        return self.sense.accel_raw
 
-# Case fått data fra accelerometer, men ikke fra GPS
-[timestamp, "01", [pos_x, pos_y], [acc_x, acc_y, acc_z]]
+    def read_timestamp(self):
+        return str(datetime.utcnow())
 
-# Case fått data fra både accelerometer og GPS
-[timestamp, "11", [pos_x, pos_y], [acc_x, acc_y, acc_z]]
+    def read_pos(self):
+        if self.gps.update():
+            if self.gps.has_fix:
+                return {"longitude": self.gps.longitude, "latitude": self.gps.latitude}
+
+        return {"longitude": None, "latitude": None}
+
+    def _pack_data(self, timestamp, acc_data, gyro_data, gps_data):
+        data = {}
+        data["timestamp"] = timestamp
+        data["g-force"] = [acc_data["x"], acc_data["y"], acc_data["z"]]
+        data["orientation"] = [gyro_data["roll"], gyro_data["pitch"], gyro_data["yaw"]]
+        data["position"] = [gps_data["longitude"], gps_data["latitude"]]
+
+        return data
+        
+
+    def run(self, freq=1000):
+        #while True:
+        timestamp = self.read_timestamp()
+        acc = self.read_acc()
+        gyro = self.read_gyro()
+        pos = self.read_pos()
+
+        sensor_data = self._pack_data(timestamp, acc, gyro, pos)
+
+        self.logger.log(sensor_data)
+
+        time.sleep(1/freq)
 
 if __name__ == "__main__":
     sensor_reader = SensorReader()
-    sensor_reader.read_gyro()
+    sensor_reader.run(freq=1)
