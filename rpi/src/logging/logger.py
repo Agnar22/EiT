@@ -13,6 +13,9 @@ class DataLogger():
 
         # sensor_data format: 
         # {"sensor_type": [value1, value2, value3..], "sensor_type2", [value1, value2, ...]}
+        # Log NULL for values not present in measurements, e.g. if "pos" is not
+        # present in sensor_data then logg a NULL for all its values
+
         
 
         log_entry = []
