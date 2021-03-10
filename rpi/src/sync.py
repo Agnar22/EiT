@@ -27,6 +27,7 @@ def post_data(data: List[List[float]])->int:
       "values": data
   }).status_code
 
+
 def sync_data_loop():
   while True:
     for file in os.listdir(data_dir):
