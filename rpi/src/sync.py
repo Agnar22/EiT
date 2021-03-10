@@ -17,7 +17,7 @@ def read_csv(file_name: str) -> List[List[float]]:
     return rows
 
 
-def post_data(data: List[List[float]]):
+def post_data(data: List[List[float]])->int:
   print(data)
   return requests.post(url,
     headers={
