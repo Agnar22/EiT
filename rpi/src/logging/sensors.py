@@ -63,5 +63,11 @@ class SensorReader():
         time.sleep(1/freq)
 
 if __name__ == "__main__":
+
+    import os
+    abspath = os.path.abspath(__file__)
+    dname = os.path.dirname(abspath)
+    os.chdir(dname)
+
     sensor_reader = SensorReader()
     sensor_reader.run(freq=1)
