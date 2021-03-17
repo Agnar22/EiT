@@ -80,34 +80,7 @@ app.post('/datapoints', authenticateJWT, (req, res) => {
     let response_message="Uploaded "+req.body.values.length+" datapoints.";
 
     for (let pos=0; pos<req.body.values.length; pos++) {
-        //console.log(req.body.values[pos]);
-        datapoints_flattened.push(req.body.values[pos]);
-        if (pos==0) {
-            parameters = "(current_timestamp - interval \'"+ Number(pos+1) +" seconds\', $"+ Number(pos+1) + ")"
-        } else {
-            parameters = parameters + ",(current_timestamp - interval \'"+Number(pos+1)+" seconds\', $"+ Number(pos+1) + ")"
-        }
-    }
-    try {
-        insert_to_db(parameters, datapoints_flattened);
-    } catch (error) {
-        console.log("Failed to insert multiple datapoints: "+error);
-        response_status=500;
-        response_message="Database error.";
-    }
-    res.status(response_status).send(response_message);
-});
-
-app.post('/datapoints', authenticateJWT, (req, res) => {
-    fs = require('fs');
-
-    let datapoints_flattened = [];
-    let parameters = "";
-    let response_status=201;
-    let response_message="Uploaded "+req.body.values.length+" datapoints.";
-
-    for (let pos=0; pos<req.body.values.length; pos++) {
-        datapoints_flattened.push(req.body.values[pos]);
+        datapoints_flattened.push(req.body.values[pos][0]);
         if (pos==0) {
             parameters = "(current_timestamp - interval \'"+ Number(pos+1) +" seconds\', $"+ Number(pos+1) + ")"
         } else {
