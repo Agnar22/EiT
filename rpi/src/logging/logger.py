@@ -30,7 +30,7 @@ class DataLogger():
         df = df.reindex(columns=self.measurements)
         
         df.to_csv(f'{self.current_log_file_path}/{datetime.datetime.now()}_{len(df.index)}',
-                    header=False, index=False, na_rep="null")
+                    header=False, index=False, na_rep=None)
 
         # check if file now has too many entries and if so move the contents to
         # not_synched file and clear the current logging file
@@ -46,6 +46,6 @@ if __name__ == "__main__":
     dl = DataLogger()
     dl.log({
             "timestamp":[datetime.datetime.now(), datetime.datetime.now()-datetime.timedelta(0,2)], "g-force_x":[1, 2], "g-force_y":[-1, 0], "g-force_z":[0.5, 2.9],
-            "orientation_roll":[-12, 2], "orientation_pitch":[2,0], "orientation_yaw":[5,2],
+            "orientation_roll":[-12, None], "orientation_pitch":[2,0], "orientation_yaw":[5,2],
             "position_longitude":[10.406478, 10.406678], "position_latitude":[63.415083, 63.416083]
    })

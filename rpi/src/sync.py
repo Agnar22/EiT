@@ -1,3 +1,4 @@
+import json
 import requests
 import os
 import time
@@ -13,11 +14,24 @@ bearer_token = ''
 def read_csv(file_name: str) -> List[List[float]]:
   with open(file_name, 'r+') as f:
     rows = list(reader(f))
-    return rows
+    conv_rows = []
+    for row in rows:
+        curr_row = []
+        for element in row:
+            if element == 'None' or element is None:
+                curr_row.append(None)
+            else:
+                try:
+                    curr_row.append(float(element))
+                except ValueError:
+                    curr_row.append(element)
+        conv_rows.append(curr_row)
+    return conv_rows
 
 
 def post_data(data: List[List[float]])->int:
   print(data)
+  print(json.dumps(data))
   return requests.post(url,
     headers={
       "Authorization": "Bearer "+bearer_token
