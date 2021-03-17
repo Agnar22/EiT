@@ -15,7 +15,7 @@ class DataLogger():
         self.measurements = [
             "timestamp", "g-force_x", "g-force_y", "g-force_z",
             "orientation_roll", "orientation_pitch", "orientation_yaw",
-            "position_longitude", "position_latitude"
+            "position_latitude", "position_longitude"
         ]
         self.num_measurements = len(self.measurements)
 
@@ -45,7 +45,7 @@ if __name__ == "__main__":
 
     dl = DataLogger()
     dl.log({
-            "timestamp":[time.time(), time.time()-2], "g-force_x":[1, 2], "g-force_y":[-1, 0], "g-force_z":[0.5, 2.9],
-            "orientation_roll":[-12, None], "orientation_pitch":[None,0], "orientation_yaw":[5,2],
-            "position_longitude":[4,8], "position_latitude":[2,9]
+            "timestamp":[datetime.datetime.now(), datetime.datetime.now()-datetime.timedelta(0,2)], "g-force_x":[1, 2], "g-force_y":[-1, 0], "g-force_z":[0.5, 2.9],
+            "orientation_roll":[-12, 2], "orientation_pitch":[2,0], "orientation_yaw":[5,2],
+            "position_longitude":[10.406478, 10.406678], "position_latitude":[63.415083, 63.416083]
    })
