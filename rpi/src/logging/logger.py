@@ -1,5 +1,6 @@
 import datetime
 import pandas as pd
+import time
 
 
 class DataLogger():
@@ -11,7 +12,11 @@ class DataLogger():
         self.data_dir = data_dir
         self.current_log_file_path = data_dir + current_log_filename
 
-        self.measurements = ["timestamp", "g-force", "orientation", "position"]
+        self.measurements = [
+            "timestamp", "g-force_x", "g-force_y", "g-force_z",
+            "orientation_roll", "orientation_pitch", "orientation_yaw",
+            "position_longitude", "position_latitude"
+        ]
         self.num_measurements = len(self.measurements)
 
     def log(self, sensor_data: dict):
@@ -24,8 +29,7 @@ class DataLogger():
         df = pd.DataFrame.from_dict(sensor_data)
         df = df.reindex(columns=self.measurements)
         
-        df.to_csv(f'{self.current_log_file_path} \
-                    {datetime.datetime.now()}_{len(df.index)}',
+        df.to_csv(f'{self.current_log_file_path}/{datetime.datetime.now()}_{len(df.index)}',
                     header=False, index=False, na_rep="null")
 
         # check if file now has too many entries and if so move the contents to
@@ -40,4 +44,8 @@ if __name__ == "__main__":
     os.chdir(dname)
 
     dl = DataLogger()
-    dl.log({"pos": [1, 2, 3, 4, None], "g-force": [-1, -2, -3, -4, 1]})
+    dl.log({
+            "timestamp":[time.time(), time.time()-2], "g-force_x":[1, 2], "g-force_y":[-1, 0], "g-force_z":[0.5, 2.9],
+            "orientation_roll":[-12, None], "orientation_pitch":[None,0], "orientation_yaw":[5,2],
+            "position_longitude":[4,8], "position_latitude":[2,9]
+   })
