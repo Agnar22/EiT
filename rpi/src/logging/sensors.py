@@ -41,10 +41,17 @@ class SensorReader():
 
     def _pack_data(self, timestamp, acc_data, gyro_data, gps_data):
         data = {}
-        data["timestamp"] = timestamp
-        data["g-force"] = [acc_data["x"], acc_data["y"], acc_data["z"]]
-        data["orientation"] = [gyro_data["roll"], gyro_data["pitch"], gyro_data["yaw"]]
-        data["position"] = [gps_data["longitude"], gps_data["latitude"]]
+        data["timestamp"] = [timestamp]
+        data["g-force_x"] = [acc_data["x"]]
+        data["g-force_y"] = [acc_data["y"]]
+        data["g-force_z"] = [acc_data["z"]]
+        data["orientation_roll"] = [gyro_data["roll"]]
+        data["orientation_pitch"] = [gyro_data["pitch"]]
+        data["orientation_yaw"] = [gyro_data["yaw"]]
+        #data["position_longitude"] = [gps_data["longitude"]]
+        #data["position_latitude"] = [gps_data["latitude"]]
+        data["position_longitude"] = [None]
+        data["position_latitude"] = [None]
 
         return data
         

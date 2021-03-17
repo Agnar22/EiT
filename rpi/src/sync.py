@@ -18,7 +18,7 @@ def read_csv(file_name: str) -> List[List[float]]:
     for row in rows:
         curr_row = []
         for element in row:
-            if element == 'None' or element is None:
+            if element == 'None' or element is None or element == '':
                 curr_row.append(None)
             else:
                 try:
