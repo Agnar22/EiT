@@ -4,8 +4,8 @@ import time
 from csv import reader
 from typing import List
 
-url = 'http://agnar.sanderkk.com:2326/datapoints'
-data_dir = '../data/data_to_sync/'
+url = 'http://agnar.sanderkk.com:2326/datapoints_all_sensors'
+data_dir = '../data/current_log/'
 sleep_time = 0.3
 bearer_token = ''
 
@@ -13,7 +13,6 @@ bearer_token = ''
 def read_csv(file_name: str) -> List[List[float]]:
   with open(file_name, 'r+') as f:
     rows = list(reader(f))
-    rows = list(map(lambda row: list(map(float, row)), rows))
     return rows
 
 
