@@ -49,7 +49,7 @@ const authenticateJWT = (req, res, next) => {
 };
 
 function insert_to_db(params, args) {
-    client.query('INSERT INTO eit.test(ts, sensor_value) VALUES '+params+' RETURNING *', args).then(res => {
+    client.query('INSERT INTO eit.sensor_values(ts, gforce_x, gforce_y, gforce_z, orientation_roll, orientation_pitch, orientation_yaw, lat, lon) VALUES '+params+' RETURNING *', args).then(res => {
         console.log("Inserted into database.");
     }).catch(err => {
         console.log(err.stack);
@@ -85,6 +85,42 @@ app.post('/datapoints', authenticateJWT, (req, res) => {
             parameters = "(current_timestamp - interval \'"+ Number(pos+1) +" seconds\', $"+ Number(pos+1) + ")"
         } else {
             parameters = parameters + ",(current_timestamp - interval \'"+Number(pos+1)+" seconds\', $"+ Number(pos+1) + ")"
+        }
+    }
+    try {
+        insert_to_db(parameters, datapoints_flattened);
+    } catch (error) {
+        console.log("Failed to insert multiple datapoints: "+error);
+        response_status=500;
+        response_message="Database error.";
+    }
+    res.status(response_status).send(response_message);
+});
+
+
+app.post('/datapoints_all_sensors', authenticateJWT, (req, res) => {
+    fs = require('fs');
+
+    let num_sensors = 9;
+    let datapoints_flattened = [];
+    let parameters = "";
+    let response_status=201;
+    let response_message="Uploaded "+req.body.values.length+" datapoints.";
+
+    for (let row=0; row<req.body.values.length; row++) {
+        let cur_parameters = "";
+        for (let col=0; col<num_sensors; col++) {
+            if (col==0) {
+                cur_parameters += "$"+Number(row*num_sensors + col + 1)
+            } else {
+                cur_parameters += ",$"+Number(row*num_sensors + col + 1)
+            }
+            datapoints_flattened.push(req.body.values[row][col]);
+        }
+        if (row==0) {
+            parameters = "("+ cur_parameters + ")"
+        } else {
+            parameters = parameters + ",(" + cur_parameters + ")"
         }
     }
     try {
