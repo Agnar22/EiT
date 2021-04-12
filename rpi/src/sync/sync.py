@@ -4,6 +4,7 @@ import os
 import time
 from csv import reader
 from typing import List
+from sense_hat import SenseHat
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -44,6 +45,9 @@ def post_data(data: List[List[float]])->int:
 
 
 def sync_data_loop():
+
+  sense = SenseHat()
+
   while True:
     for file in os.listdir(data_dir):
       data = read_csv(data_dir+file)
@@ -55,6 +59,15 @@ def sync_data_loop():
       print(f'status_code {status_code}')
       if status_code == 201:
         os.remove(data_dir+file)
+
+    # Toggle green LED
+    val = sense.get_pixel(1,0)
+    
+    if val == [0, 0, 0]:
+        sense.set_pixel(1, 0, (0, 255, 0))
+    else:
+        sense.set_pixel(1, 0, (0, 0, 0))
+
     time.sleep(sleep_time)
 
 if __name__ == '__main__':

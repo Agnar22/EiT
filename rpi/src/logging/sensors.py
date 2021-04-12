@@ -55,11 +55,14 @@ class SensorReader():
 
     def run(self, freq=1000, sync_size=600):
         sensor_data = {}
+        
+        count = 0
+
         while True:
             timestamp = self.read_timestamp()
             acc = self.read_acc()
             gyro = self.read_gyro()
-            pos = self.read_pos()
+            # pos = self.read_pos()
 
             sensor_data = self._pack_data(sensor_data, timestamp, acc, gyro, None)
 
@@ -68,7 +71,18 @@ class SensorReader():
                 self.logger.log(sensor_data)
                 sensor_data={}
 
+            # Toggle green led
+            count += 1
+            if count >= freq:
+                val = self.sense.get_pixel(2, 0)
+                if val == [0,0,0]:
+                    self.sense.set_pixel(2, 0, (0, 255, 0))
+                else:
+                    self.sense.set_pixel(2, 0, (0, 0, 0))
+                count = 0
+
             time.sleep(1/freq)
+
 
 if __name__ == "__main__":
 

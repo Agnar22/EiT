@@ -124,7 +124,7 @@ def check_server_connection(retry_count=10, debug=False):
 def main():
     debug = False
     sense.show_message("verbose y > n <")
-    event = sense.stick.wait_for_event()
+    event = sense.stick.wait_for_event(emptybuffer=True)
     if event.direction == "right":
         debug = True
 
@@ -133,7 +133,7 @@ def main():
     while not start_offline:
         if check_server_connection(debug=debug) == False:
             sense.show_message("cont. w/o inet > or retry < ?")
-            event = sense.stick.wait_for_event()
+            event = sense.stick.wait_for_event(emptybuffer=True)
             if event.direction == "left":
                 continue
             else:
@@ -153,7 +153,7 @@ def main():
         if not sensor_success:
             sense.show_message("fail retry < exit >")
             
-            event = sense.stick.wait_for_event()
+            event = sense.stick.wait_for_event(emptybuffer=True)
             if event.direction == "right":
                 sense.show_message("exiting")
                 sys.exit()
