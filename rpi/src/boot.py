@@ -115,6 +115,8 @@ def check_server_connection(retry_count=10, debug=False):
         if debug:
             sense.show_message("ok")
         set_server_connection_status(green)
+        subprocess.run(["sudo python3 ./sync/ping.py &"], check=True, shell=True)
+
         return True
     else:
         print("Failed to ping server")
