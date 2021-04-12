@@ -39,35 +39,36 @@ class SensorReader():
 
         return {"longitude": None, "latitude": None}
 
-    def _pack_data(self, timestamp, acc_data, gyro_data, gps_data):
-        data = {}
-        data["timestamp"] = [timestamp]
-        data["g-force_x"] = [acc_data["x"]]
-        data["g-force_y"] = [acc_data["y"]]
-        data["g-force_z"] = [acc_data["z"]]
-        data["orientation_roll"] = [gyro_data["roll"]]
-        data["orientation_pitch"] = [gyro_data["pitch"]]
-        data["orientation_yaw"] = [gyro_data["yaw"]]
-        #data["position_longitude"] = [gps_data["longitude"]]
-        #data["position_latitude"] = [gps_data["latitude"]]
-        data["position_longitude"] = [None]
-        data["position_latitude"] = [None]
+    def _pack_data(self, data, timestamp, acc_data, gyro_data, gps_data):
+        data.setdefault("timestamp", []).append(timestamp)
+        data.setdefault("g-force_x", []).append(acc_data["x"])
+        data.setdefault("g-force_y", []).append(acc_data["y"])
+        data.setdefault("g-force_z", []).append(acc_data["z"])
+        data.setdefault("orientation_roll", []).append(gyro_data["roll"])
+        data.setdefault("orientation_pitch", []).append(gyro_data["pitch"])
+        data.setdefault("orientation_yaw", []).append(gyro_data["yaw"])
+        data.setdefault("position_longitude", []).append(None)
+        data.setdefault("position_latitude", []).append(None)
 
         return data
         
 
-    def run(self, freq=1000):
-        #while True:
-        timestamp = self.read_timestamp()
-        acc = self.read_acc()
-        gyro = self.read_gyro()
-        pos = self.read_pos()
+    def run(self, freq=1000, sync_size=600):
+        sensor_data = {}
+        while True:
+            timestamp = self.read_timestamp()
+            acc = self.read_acc()
+            gyro = self.read_gyro()
+            pos = self.read_pos()
 
-        sensor_data = self._pack_data(timestamp, acc, gyro, pos)
+            sensor_data = self._pack_data(sensor_data, timestamp, acc, gyro, None)
 
-        self.logger.log(sensor_data)
+            if len(sensor_data["timestamp"])%sync_size == 0 and len(sensor_data["timestamp"]) != 0:
+                print("Logging")
+                self.logger.log(sensor_data)
+                sensor_data={}
 
-        time.sleep(1/freq)
+            time.sleep(1/freq)
 
 if __name__ == "__main__":
 
@@ -77,4 +78,4 @@ if __name__ == "__main__":
     os.chdir(dname)
 
     sensor_reader = SensorReader()
-    sensor_reader.run(freq=1)
+    sensor_reader.run(freq=10)
