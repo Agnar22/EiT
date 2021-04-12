@@ -27,12 +27,7 @@ def check_server_connection(retry_count=10):
             print(e)
             continue
     
-    if success:
-        print(f"Successfully pinged server. Status_code: {status_code} Content: {content}")
-        return True
-    else:
-        print("Failed to ping server")
-        return False
+    return success
 
 def main(freq=0.25):
     
