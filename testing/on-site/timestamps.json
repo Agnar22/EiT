@@ -1,0 +1,98 @@
+{
+  "kjøretur med boks festet nederst på hjørnet på langside": {
+    "forsøk1": {
+      "start": "09:08:50",
+      "slutt": "09:10:14"
+    },
+    "forsøk2": {
+      "start": "09:10:50",
+      "slutt": "09:11:43"
+    },
+    "forsøk3": {
+      "start": "09:11:32",
+      "slutt": "09:12:30"
+    }
+  },
+  "kjøretur med boks festet midt på langside": {
+    "forsøk1": {
+      "start": "09:14:13",
+      "slutt": "09:14:56"
+    },
+    "forsøk2": {
+      "start": "09:15:00",
+      "slutt": "09:15:41"
+    },
+    "forsøk3": {
+      "start": "09:15:50",
+      "slutt": "09:16:28"
+    }
+  },
+  "kjøretur med boks festet midt på kortside": {
+    "forsøk1": {
+      "start": "09:17:09",
+      "slutt": "09:17:54"
+    },
+    "forsøk2": {
+      "start": "09:17:54",
+      "slutt": "09:18:40"
+    },
+    "forsøk3": {
+      "start": "09:18:41",
+      "slutt": "09:19:27"
+    }
+  },
+  "pålessing av container fra bakke til togvogn": {
+    "forsøk1": {
+      "start": "09:20:50",
+      "slutt": "09:22:20"
+    }
+  },
+  "avlessing av container fra togvogn til bakke": {
+    "forsøk1": {
+      "start": "09:22:30",
+      "slutt": "09:23:40"
+    }
+  },
+  "innvendig slipp fra 2m av 1,5L-brusflaske med vann": {
+    "forsøk1": {
+      "start": "09:27:35",
+      "slutt": "09:27:37"
+    },
+    "forsøk2": {
+      "start": "09:27:47",
+      "slutt": "09:27:48"
+    },
+    "forsøk3": {
+      "start": "09:28:02",
+      "slutt": "09:28:05"
+    }
+  },
+  "innvendig slipp fra 2m av 0,5L-brusflaske med vann": {
+    "forsøk1": {
+      "start": "09:28:47",
+      "slutt": "09:28:48"
+    },
+    "forsøk2": {
+      "start": "09:29:05",
+      "slutt": "09:29:08"
+    },
+    "forsøk3": {
+      "start": "09:29:16",
+      "slutt": "09:29:19"
+    }
+  },
+  "innvendig kast fra 2m av fotball": {
+    "forsøk1": {
+      "start": "09:29:42",
+      "slutt": "09:29:45"
+    },
+    "forsøk2": {
+      "start": "09:29:59",
+      "slutt": "09:30:03"
+    },
+    "forsøk3": {
+      "start": "09:30:19",
+      "slutt": "09:30:22"
+    }
+  }
+}
